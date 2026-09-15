@@ -1,0 +1,5 @@
+# Non-secret test configuration placeholder
+APP_ENV=test
+LOG_LEVEL=warning
+DATABASE_URL=replace-with-test-value
+

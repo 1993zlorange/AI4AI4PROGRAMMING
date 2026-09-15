@@ -1,0 +1,5 @@
+# Production configuration template. Never put real secrets here.
+APP_ENV=production
+LOG_LEVEL=info
+DATABASE_URL=inject-at-deploy-time
+

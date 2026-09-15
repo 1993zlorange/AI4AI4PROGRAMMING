@@ -1,0 +1,5 @@
+# Non-secret development configuration placeholder
+APP_ENV=development
+LOG_LEVEL=debug
+DATABASE_URL=replace-with-local-value
+

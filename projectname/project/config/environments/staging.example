@@ -1,0 +1,5 @@
+# Staging configuration template. Inject real values outside Git.
+APP_ENV=staging
+LOG_LEVEL=info
+DATABASE_URL=inject-at-deploy-time
+

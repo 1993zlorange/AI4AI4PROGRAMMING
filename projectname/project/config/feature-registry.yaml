@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "feature_id_pattern": "F[0-9]{3}",
+  "feature_code_pattern": "[A-Z][A-Z0-9_]+",
+  "required_fields": [
+    "feature_id",
+    "feature_code",
+    "feature_name",
+    "owner",
+    "implementation_paths",
+    "test_paths",
+    "status"
+  ],
+  "allowed_engineering_top_level": [
+    ".github",
+    "apps",
+    "config",
+    "database",
+    "docs",
+    "logs",
+    "output",
+    "packages",
+    "release",
+    "scripts",
+    "storage",
+    "tests"
+  ],
+  "functional_extensions": [".py", ".ts", ".tsx", ".js", ".jsx"],
+  "features": [
+    {
+      "feature_id": "F001",
+      "feature_code": "GOVERNANCE_VALIDATE",
+      "feature_name": "项目治理校验",
+      "owner": "项目监理、工程师",
+      "implementation_paths": ["scripts/f001_governance_validate.py"],
+      "test_paths": ["tests/test_f001_governance_validate.py"],
+      "status": "active"
+    },
+    {
+      "feature_id": "F002",
+      "feature_code": "SKILL_PROMOTION_AUDIT",
+      "feature_name": "Skill 晋升审计",
+      "owner": "项目监理、工程师",
+      "implementation_paths": ["scripts/f002_skill_promotion_audit.py"],
+      "test_paths": ["tests/test_f002_skill_promotion_audit.py"],
+      "status": "active"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "required_evidence": [
+    "project_skill",
+    "proposal_ref",
+    "pilot_ref",
+    "independent_review_ref",
+    "security_scan_ref",
+    "human_approval_ref",
+    "global_install_ref",
+    "rollback_ref"
+  ],
+  "promotions": []
+}

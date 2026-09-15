@@ -1,0 +1,12 @@
+{
+  "name": "web-project-template",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Blank modular monorepo scaffold for an open-source web project.",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "check": "echo \"Configure format, typecheck, lint, test, and build checks before implementation.\"",
+    "test": "echo \"No tests are implemented yet.\""
+  }
+}
+

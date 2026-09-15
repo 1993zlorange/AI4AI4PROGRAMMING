@@ -1,0 +1,24 @@
+# OS / editor junk
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+
+# Environment & secrets (real values only; .env.example stays tracked)
+.env
+.env.local
+.env.*.local
+
+# Python runtime
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node runtime
+node_modules/
+dist/
+coverage/
+
+# Local run artifacts (project layout keeps output/ per-run isolated)
+projectname/project/output/
