@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="AI4PROGRAMMING 通俗易懂项目手册：把项目监理、项目经理、架构师、工程师、测试和用户授权，整理成一条能照着走的软件交付路径。">
+<title>AI4PROGRAMMING 通俗版项目手册</title>
+<link rel="icon" href="data:,">
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fb;--panel:#fff;--panel-2:#fbfcff;--ink:#17202c;--muted:#647082;--line:#e2e8f0;--brand:#1258e7;--brand-2:#4f8bff;--brand-ink:#0d4bc4;--brand-soft:#ebf2ff;--ok:#12805c;--ok-soft:#e8f7f0;--warn:#a15900;--warn-soft:#fff5e6;--danger:#b42318;--danger-soft:#fff1ef;--code:#101828;--code-ink:#e9f2ff;--shadow:0 10px 30px rgba(16,24,40,.08)}
+html[data-theme=dark]{--bg:#070a10;--panel:#101825;--panel-2:#151f30;--ink:#e9eef8;--muted:#9aa6ba;--line:#28344a;--brand:#7ea4ff;--brand-2:#9dbbff;--brand-ink:#b9ccff;--brand-soft:#17243c;--ok:#7bdfae;--ok-soft:#102a20;--warn:#f2b662;--warn-soft:#31230f;--danger:#ff9f95;--danger-soft:#321814;--code:#060a12;--code-ink:#d9e6ff;--shadow:none}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:88px}body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI","Microsoft YaHei",Inter,system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.78}a{color:var(--brand);text-decoration:none}a:hover{text-decoration:underline}button{font:inherit;cursor:pointer}code{font-family:Consolas,"SFMono-Regular","Liberation Mono",monospace;font-size:.9em}
+.topbar{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--panel) 93%,transparent);backdrop-filter:blur(12px)}.topbar-inner{max-width:1420px;margin:auto;min-height:64px;display:flex;align-items:center;gap:18px;padding:10px 24px}.brand{display:flex;align-items:center;gap:10px;font-weight:760;color:var(--ink)}.brand-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:linear-gradient(135deg,var(--brand),#77b7ff);color:#fff;font-size:13px;font-weight:850}.top-links{display:flex;gap:4px;overflow:auto}.top-links a{color:var(--muted);padding:8px 10px;border-radius:8px;white-space:nowrap}.top-links a:hover,.top-links a.active{color:var(--ink);background:var(--brand-soft);text-decoration:none}.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.button{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:9px;padding:7px 11px;font-size:13px;white-space:nowrap}.button:hover{border-color:var(--brand);color:var(--brand)}.button.primary{background:var(--brand);border-color:var(--brand);color:#fff}html[data-theme=dark] .button.primary{color:#08111f}
+.shell{max-width:1420px;margin:auto;display:grid;grid-template-columns:282px minmax(0,1fr) 252px;gap:26px;padding:26px 22px 70px}.sidebar,.toc{position:sticky;top:88px;max-height:calc(100vh - 112px);overflow:auto;padding:16px 14px 24px;border:1px solid var(--line);background:var(--panel);border-radius:16px;box-shadow:var(--shadow)}.sidebar strong,.toc strong{display:block;margin:3px 0 10px;font-size:13px;color:var(--muted);letter-spacing:.05em}.side-group{margin:0 0 16px}.side-title{margin:0 7px 5px;font-size:12px;color:var(--muted);font-weight:750;text-transform:uppercase;letter-spacing:.04em}.sidebar ul,.toc ul{list-style:none;margin:0;padding:0}.sidebar a,.toc a{display:block;padding:7px 9px;border-radius:8px;color:var(--muted);font-size:14px;line-height:1.45}.sidebar a:hover,.toc a:hover{background:var(--brand-soft);color:var(--ink);text-decoration:none}.sidebar a.active,.toc a.active{background:var(--brand-soft);color:var(--brand-ink);font-weight:650}
+main{min-width:0;border:1px solid var(--line);background:var(--panel);border-radius:20px;box-shadow:var(--shadow);padding:38px 46px}.breadcrumb{font-size:13px;color:var(--muted)}.eyebrow{display:inline-flex;padding:5px 10px;border-radius:999px;background:var(--brand-soft);color:var(--brand-ink);font-size:12px;font-weight:750}h1{margin:12px 0 10px;font-size:clamp(31px,4vw,46px);line-height:1.14;letter-spacing:-.02em}.lead{max-width:900px;margin:0;color:var(--muted);font-size:18px}.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px;margin:25px 0 0}@media (min-width:1000px){.meta-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}.meta-card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:color-mix(in srgb,var(--brand-soft) 50%,transparent)}.meta-card b{display:block;font-size:12px;color:var(--muted)}.meta-card span{display:block;font-size:14px;font-weight:650;overflow-wrap:anywhere}
+h2{margin:48px 0 12px;font-size:28px;line-height:1.25;letter-spacing:-.01em;scroll-margin-top:100px}h3{margin:28px 0 8px;font-size:20px}p{margin:8px 0 12px}ul,ol{padding-left:22px}li{margin:4px 0}.note,.tip,.warn,.danger{border:1px solid transparent;border-radius:13px;padding:14px 16px;margin:16px 0}.note{border-left:4px solid var(--brand);background:var(--brand-soft)}.tip{border-left:4px solid var(--ok);background:var(--ok-soft)}.warn{border-left:4px solid #d9822b;background:var(--warn-soft)}.danger{border-left:4px solid var(--danger);background:var(--danger-soft)}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:13px;margin:16px 0}.card{border:1px solid var(--line);border-radius:14px;background:var(--panel-2);padding:16px;box-shadow:0 2px 8px rgba(16,24,40,.04)}.card h3{margin:0 0 6px;font-size:17px}.card p{margin:0;color:var(--muted);font-size:14.5px}.role-card{border-top:4px solid var(--brand)}.role-card.doer{border-top-color:var(--ok)}.role-card.checker{border-top-color:var(--warn)}.role-card.owner{border-top-color:#7c5cff}
+.flow{display:grid;gap:10px;margin:20px 0}.flow-row{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;position:relative;padding-bottom:16px}.flow-row:last-child{padding-bottom:0}.flow-row:not(:last-child):before{content:"";position:absolute;left:15px;top:36px;bottom:0;width:3px;border-radius:2px;background:linear-gradient(var(--brand-2),var(--line))}.flow-row:not(:last-child):after{content:"";position:absolute;left:9px;top:calc(100% - 21px);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid var(--brand-2);z-index:1}.flow-num{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-size:13px;font-weight:800;box-shadow:0 3px 10px rgba(18,88,231,.2);z-index:1}.flow-body{border:1px solid var(--line);border-radius:12px;background:var(--panel-2);padding:11px 13px}.flow-body b{display:block}.flow-body small{display:block;color:var(--muted);margin-top:2px}.flow-tag{display:inline-flex;margin-top:7px;padding:2px 8px;border-radius:999px;background:var(--brand-soft);color:var(--brand-ink);font-size:11px;font-weight:750}
+.gate-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.gate{border:1px solid var(--line);border-radius:13px;padding:15px;background:var(--panel-2)}.gate b{display:block;margin-bottom:4px}.gate small{color:var(--muted)}.table-scroll{overflow:auto;border:1px solid var(--line);border-radius:13px;background:var(--panel);margin:16px 0}.table-scroll table{border-collapse:collapse;width:100%;min-width:660px;font-size:14.5px}th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--panel-2);color:var(--ink);font-weight:750;white-space:nowrap}tbody tr:last-child td{border-bottom:0}tbody tr:hover td{background:color-mix(in srgb,var(--brand-soft) 38%,transparent)}
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;background:var(--brand-soft);color:var(--brand-ink);font-size:12px;font-weight:750}.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.owner{background:#efeaff;color:#613bff}html[data-theme=dark] .pill.owner{background:#221d43;color:#b8a7ff}
+.pager{display:flex;justify-content:space-between;gap:12px;margin-top:45px}.pager div{border:1px solid var(--line);border-radius:12px;padding:11px 13px;min-width:180px;background:var(--panel-2)}.pager b{display:block;font-size:12px;color:var(--muted)}.pager a{font-weight:650}.feedback{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:22px;padding:14px;border-radius:13px;background:var(--brand-soft);color:var(--brand-ink)}
+.page-footer{max-width:1420px;margin:auto;padding:0 24px 38px;color:var(--muted);font-size:13px}@media (max-width:1220px){.shell{grid-template-columns:250px minmax(0,1fr)}.toc{display:none}}@media (max-width:900px){.shell{display:flex;flex-direction:column;padding:16px 14px 60px}main{order:-1;padding:22px 18px}.sidebar,.toc{position:static;max-height:none;margin-bottom:16px}.top-links{display:none}.pager{flex-direction:column}}@media (max-width:520px){main{padding:22px 16px}.topbar-inner{padding:10px 12px;gap:8px}.brand span:last-child{display:none}#print{display:none}.actions{gap:4px}.button{padding:6px 8px;font-size:12px}}@media print{.topbar,.sidebar,.toc,.actions,.feedback,.pager{display:none!important}body{background:#fff;color:#111}main{border:0;box-shadow:none;padding:0}.shell{display:block}.flow-row{break-inside:avoid}.table-scroll{overflow:visible;border:0}th,td{border:1px solid #999}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><a class="brand" href="#top"><span class="brand-mark">AI</span><span>AI4PROGRAMMING 项目手册</span></a><nav class="top-links" aria-label="主要章节"><a href="#quick-start">快速开始</a><a href="#core-model">核心模型</a><a href="#workflow">全流程</a><a href="#roles">角色</a><a href="#release">发布</a><a href="#checklist">清单</a></nav><div class="actions"><button class="button" id="theme" type="button">主题</button><button class="button" id="print" type="button">打印</button><button class="button primary" id="copy" type="button">复制页面要点</button></div></div></header>
+
+<div class="shell" id="top">
+<aside class="sidebar" aria-label="完整章节导航"><strong>阅读路径</strong>
+<div class="side-group"><p class="side-title">入门</p><ul><li><a href="#why">它解决什么问题</a></li><li><a href="#quick-start">快速开始</a></li><li><a href="#core-model">10 分钟核心模型</a></li></ul></div>
+<div class="side-group"><p class="side-title">流程</p><ul><li><a href="#workflow">从想法到交付</a></li><li><a href="#gates">五个关键关口</a></li><li><a href="#roles">角色怎么做</a></li></ul></div>
+<div class="side-group"><p class="side-title">落地</p><ul><li><a href="#records">记录放在哪里</a></li><li><a href="#quality">质量怎么判</a></li><li><a href="#change">变更和故障</a></li><li><a href="#release">发布规则</a></li><li><a href="#faq">常见误区</a></li><li><a href="#weekly">一周演练</a></li><li><a href="#checklist">收尾清单</a></li><li><a href="#sources">来源与边界</a></li></ul></div>
+</aside>
+
+<main>
+<div class="breadcrumb"><a href="#top">AI4PROGRAMMING</a> / 项目手册 / <span>通俗版</span></div>
+<span class="eyebrow">项目手册 · 2026-09-16</span>
+<h1>从一个想法，到一件可信交付</h1>
+<p class="lead">这本手册把当前软件项目流程改写成一条能照着走的路径。你可以把它理解成“盖房子”：先问清业主想住什么，再画图，再施工，再由不施工的人验收；没有业主点头，不能交房。</p>
+<div class="meta-grid">
+<div class="meta-card"><b>适合读者</b><span>新成员 · 项目决策人 · Agent 协作者</span></div>
+<div class="meta-card"><b>当前基线</b><span><a href="20260915-软件项目Agent协作-流程说明.md">2026-09-15 流程说明</a></span></div>
+<div class="meta-card"><b>建议时长</b><span>入门 15 分钟；全览 45 分钟</span></div>
+<div class="meta-card"><b>读完能懂</b><span>谁先做、谁批准、谁验收、何时能发布</span></div>
+</div>
+
+<section id="why"><h2>1. 它解决什么问题</h2>
+<p>AI 参与开发后，最容易出现的不是“完全不会做”，而是下面这些混乱：</p>
+<div class="card-grid">
+<div class="card"><h3>想法散</h3><p>聊天里有很多要求，但没有范围、失败行为和验收标准。</p></div>
+<div class="card"><h3>责任散</h3><p>同一个角色既定需求、又写代码、又说自己验收通过。</p></div>
+<div class="card"><h3>证据散</h3><p>页面能打开就说完成，但不知道数据、恢复和失败路径是否正确。</p></div>
+<div class="card"><h3>改动乱</h3><p>新功能上线了，旧功能悄悄消失。</p></div>
+<div class="card"><h3>发布急</h3><p>没经用户明确授权，就打包、部署或上传。</p></div>
+<div class="card"><h3>记录断</h3><p>做了什么、验证过什么、还有什么风险，之后就找不到证据。</p></div>
+</div>
+<div class="note"><b>一句话记忆：</b>AI4PROGRAMMING 不是“让 AI 随便写代码”，而是把开发拆成可检查的小闭环：先登记，再确认，再设计，再实现，再独立验收，再授权发布。</div>
+</section>
+
+<section id="quick-start"><h2>2. 快速开始：新项目第一次启动</h2>
+<p>假设你只有一个模糊想法，例如“我想做一个更好用的教学后台”。不要直接让 AI 写代码，按这张表走：</p>
+<div class="table-scroll"><table><thead><tr><th>步骤</th><th>你要做什么</th><th>预期看到什么</th><th>常见错误</th></tr></thead><tbody>
+<tr><td><b>1. 项目监理登记</b></td><td>说明目标、输入、目录、权限、风险和验收方式。</td><td>需求记录和监督记录。</td><td>只说“帮我做个系统”，没有边界。</td></tr>
+<tr><td><b>2. 需求澄清</b></td><td>项目经理把模糊想法整理成需求理解契约。</td><td>用户、触发、输入、输出、失败行为和验收。</td><td>把聊天记录直接当成需求。</td></tr>
+<tr><td><b>3. 用户确认</b></td><td>由你确认范围和优先级。</td><td>Requirements Understanding Contract 被确认。</td><td>AI 自己推断成“用户已经同意”。</td></tr>
+<tr><td><b>4. 设计批准</b></td><td>架构师给出模块、接口、数据和迁移方案。</td><td>SDD/ADR 和实施顺序。</td><td>还没批准设计就开始改架构。</td></tr>
+<tr><td><b>5. 工程实现</b></td><td>工程师按契约实现并自证。</td><td>代码、测试、文档和隔离证据。</td><td>只测 happy path。</td></tr>
+<tr><td><b>6. 独立验收</b></td><td>项目测试用隔离数据检查用户路径。</td><td>PASS / FAIL / BLOCKED 和证据。</td><td>用开发者自测代替独立验收。</td></tr>
+<tr><td><b>7. 授权发布</b></td><td>用户明确同意后才发布。</td><td>发布包、烟测和回滚方案。</td><td>“看起来好了”就自动上线。</td></tr>
+</tbody></table></div>
+<div class="tip"><b>新手提示：</b>不确定时先问三个问题——这个功能的输入是什么？失败时应该怎样？什么证据能证明它完成？</div>
+</section>
+
+<section id="core-model"><h2>3. 10 分钟核心模型</h2>
+<p>当前项目可以用“三个门槛 + 六个角色”理解。</p>
+<h3>3.1 三个最重要的门槛</h3>
+<div class="gate-grid">
+<div class="gate"><span class="pill">Gate 1</span><b>用户确认需求</b><small>需求契约没确认，不冻结 PRD/SRS，不派发设计和实现。</small></div>
+<div class="gate"><span class="pill warn">Gate 2</span><b>设计批准</b><small>接口、数据、迁移和回滚方案批准后，工程师才能实现。</small></div>
+<div class="gate"><span class="pill ok">Gate 3</span><b>独立验收 + 用户授权</b><small>测试通过只说明可交付候选；发布仍需用户明确授权。</small></div>
+</div>
+<h3>3.2 六个角色怎么分工</h3>
+<div class="card-grid">
+<div class="card role-card owner"><h3>用户 / 项目决策人</h3><p>像业主。确认要什么，批准关键取舍，决定是否发布。</p></div>
+<div class="card role-card checker"><h3>项目监理</h3><p>像登记台和安全员。登记范围、路径、权限、风险、记录和关闭状态。</p></div>
+<div class="card role-card"><h3>项目经理</h3><p>像需求翻译官。把想法变成 PRD/SRS、验收标准、计划和状态。</p></div>
+<div class="card role-card"><h3>项目架构师</h3><p>像建筑设计师。定模块边界、接口、数据、迁移、回滚和测试挂钩。</p></div>
+<div class="card role-card doer"><h3>全栈工程师</h3><p>像施工队。按批准设计实现，写测试，保存证据，不做范围外的事。</p></div>
+<div class="card role-card checker"><h3>项目测试</h3><p>像独立验房师。用隔离数据检查页面、API、数据和失败路径。</p></div>
+</div>
+<div class="note"><b>关键边界：</b>写代码的人不能替独立测试下结论；测试通过也不能代替用户决定是否发布。</div>
+</section>
+
+<section id="workflow"><h2>4. 全流程：从想法到交付</h2>
+<p>下面是当前流程的主干。每一格都可以追溯到 20260915 流程说明。</p>
+<div class="flow" aria-label="当前软件项目主流程逻辑图">
+<div class="flow-row"><span class="flow-num">1</span><div class="flow-body"><b>用户提出请求</b><small>说清目标、输入、限制和期望结果。</small><span class="flow-tag">入口</span></div></div>
+<div class="flow-row"><span class="flow-num">2</span><div class="flow-body"><b>项目监理登记</b><small>登记需求、路径、权限、风险、停止条件和日志位置。</small><span class="flow-tag">先登记，后执行</span></div></div>
+<div class="flow-row"><span class="flow-num">3</span><div class="flow-body"><b>需求发现</b><small>项目经理形成 Requirements Understanding Contract。</small><span class="flow-tag">区分事实 / 推断 / 未知</span></div></div>
+<div class="flow-row"><span class="flow-num">4</span><div class="flow-body"><b>用户确认需求</b><small>确认前不冻结 PRD/SRS，不派发架构和实现。</small><span class="flow-tag">人工 Gate</span></div></div>
+<div class="flow-row"><span class="flow-num">5</span><div class="flow-body"><b>形成 PRD/SRS</b><small>写清 Must / Should / Could / Won’t now、失败行为和验收。</small></div></div>
+<div class="flow-row"><span class="flow-num">6</span><div class="flow-body"><b>架构 / SDD / ADR</b><small>定义边界、接口、数据、迁移、回滚和测试挂钩。</small></div></div>
+<div class="flow-row"><span class="flow-num">7</span><div class="flow-body"><b>设计批准</b><small>关键取舍由用户或项目决策人批准。</small><span class="flow-tag">人工 Gate</span></div></div>
+<div class="flow-row"><span class="flow-num">8</span><div class="flow-body"><b>工程实现</b><small>契约/schema → domain → application → adapters → API/UI。</small></div></div>
+<div class="flow-row"><span class="flow-num">9</span><div class="flow-body"><b>项目经理符合性检查</b><small>核对实现是否符合需求、设计和用户路径。</small></div></div>
+<div class="flow-row"><span class="flow-num">10</span><div class="flow-body"><b>项目测试独立验收</b><small>隔离数据下检查功能、API、状态、错误、恢复和浏览器。</small><span class="flow-tag">PASS / FAIL / BLOCKED</span></div></div>
+<div class="flow-row"><span class="flow-num">11</span><div class="flow-body"><b>监理闭环</b><small>记录日志、质量、变更、成本、证据和残余风险。</small></div></div>
+<div class="flow-row"><span class="flow-num">12</span><div class="flow-body"><b>用户明确授权后发布</b><small>形成版本清单、烟测、回滚方案和发布说明。</small><span class="flow-tag">人工 Gate</span></div></div>
+</div>
+<div class="warn"><b>回派规则：</b>项目经理检查不符合，回工程师；测试 FAIL，回工程师；BLOCKED 要记录原因和所需决定，不能假装通过。</div>
+</section>
+
+<section id="gates"><h2>5. 五个关键关口</h2>
+<div class="table-scroll"><table><thead><tr><th>关口</th><th>谁能通过</th><th>不能怎么替代</th><th>通过后才能做什么</th></tr></thead><tbody>
+<tr><td><b>需求确认</b></td><td>用户确认需求理解契约。</td><td>不能靠 AI 推断或聊天语气。</td><td>冻结 PRD/SRS，派发架构和实现。</td></tr>
+<tr><td><b>设计批准</b></td><td>用户或项目决策人批准 SDD/ADR。</td><td>不能靠“代码能跑”补设计。</td><td>工程师按 SDD 实现。</td></tr>
+<tr><td><b>符合性检查</b></td><td>项目经理按需求/设计核对。</td><td>不能靠代码存在或单测通过。</td><td>交给项目测试独立验收。</td></tr>
+<tr><td><b>独立验收</b></td><td>项目测试在隔离环境验收。</td><td>不能靠开发者自测或旧截图。</td><td>形成可交付候选。</td></tr>
+<tr><td><b>发布授权</b></td><td>用户明确授权。</td><td>不能靠测试 PASS 自动上线。</td><td>打包、烟测、发布和记录回滚。</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="roles"><h2>6. 角色怎么做</h2>
+<h3>6.1 项目监理</h3><p><b>一句话：</b>先把事实登记下来，再让专业角色干活。</p><ul><li>登记需求、范围、路径、权限、风险和验收。</li><li>检查文件命名、目录归属和证据。</li><li>维护日志、质量、变更、成本和反思。</li><li>不批准产品需求，不代替架构、实现、测试或用户验收。</li></ul>
+<h3>6.2 项目经理</h3><p><b>一句话：</b>把“我想要个东西”变成“能验收的需求”。</p><ul><li>澄清目标、输入、输出、失败行为和优先级。</li><li>维护 PRD/SRS、风险、计划和交接包。</li><li>检查实现是否符合需求与设计。</li><li>不写代码，也不替代独立测试。</li></ul>
+<h3>6.3 项目架构师</h3><p><b>一句话：</b>先决定房子的结构和水电，再让施工队开工。</p><ul><li>定义模块边界、依赖方向、API、数据和事件。</li><li>设计数据库、迁移、回填、恢复和回滚。</li><li>给出测试挂钩、实施阶段和验收门。</li><li>不改写需求，不擅自实现代码。</li></ul>
+<h3>6.4 全栈工程师</h3><p><b>一句话：</b>按批准图纸施工，并留下可复现证据。</p><ul><li>先定契约/schema，再做 domain/application/adapters/API/UI。</li><li>写单元、契约、集成、E2E 和必要浏览器验证。</li><li>更新文档、配置和迁移。</li><li>需求或架构不清时停止，不自行扩范围。</li></ul>
+<h3>6.5 项目测试</h3><p><b>一句话：</b>用独立证据判断“用户路径真的能用吗”。</p><ul><li>隔离数据下测试 UI、API、持久化、权限、错误和恢复。</li><li>检查刷新后状态、Console、PageError 和响应式。</li><li>结论只有 PASS / FAIL / BLOCKED。</li><li>只读验收，不修改产品代码。</li></ul>
+<h3>6.6 用户 / 项目决策人</h3><p><b>一句话：</b>确认方向、批准取舍、决定发布。</p><ul><li>确认需求理解契约和关键设计取舍。</li><li>授权高风险动作和发布。</li><li>审阅最终结果。</li><li>不需要替 Agent 伪造执行证据。</li></ul>
+<div class="logic-map-note note"><b>角色协作逻辑图：</b>需求进入 → 项目经理澄清 → 架构师设计 → 工程师实现 → 项目经理检查 → 项目测试复验 → 结论闭环。FAIL 回工程师；BLOCKED 记录决定；PASS 交监理关闭。</div>
+</section>
+
+<section id="records"><h2>7. 记录放在哪里</h2>
+<div class="table-scroll"><table><thead><tr><th>你找什么</th><th>去哪里</th><th>通俗解释</th></tr></thead><tbody>
+<tr><td>项目规则</td><td><code>AGENTS.md</code>、<code>projectname/project/AGENTS.md</code></td><td>谁能做什么，文件放哪里。</td></tr>
+<tr><td>当前流程事实源</td><td><code>20260915-软件项目Agent协作-流程说明.md</code></td><td>本手册解释它，但不替代它。</td></tr>
+<tr><td>需求</td><td><code>achieve/00-项目管理/requirements/</code></td><td>用户要求什么，边界和验收是什么。</td></tr>
+<tr><td>架构与设计</td><td><code>achieve/02-架构与设计/</code></td><td>系统怎么组织，接口和数据怎么定。</td></tr>
+<tr><td>测试与验收</td><td><code>achieve/03-测试与验收/</code></td><td>谁检查过，证据在哪里。</td></tr>
+<tr><td>交付材料</td><td><code>achieve/04-交付与阶段/</code></td><td>手册、阶段报告、发布说明。</td></tr>
+<tr><td>运行截图 / trace</td><td><code>projectname/project/output/&lt;类型&gt;/&lt;run-id&gt;/</code></td><td>临时证据，不混入正式数据。</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="quality"><h2>8. 质量怎么判</h2>
+<p>不要只问“能不能跑”，要按风险分层检查。</p>
+<div class="card-grid">
+<div class="card"><h3>L1 静态</h3><p>路径、命名、目录、配置、敏感信息和链接。</p></div>
+<div class="card"><h3>L2 单元 / 契约</h3><p>正常、边界、非法输入、幂等和兼容。</p></div>
+<div class="card"><h3>L3 集成</h3><p>真实数据库、进程、迁移、日志和产物。</p></div>
+<div class="card"><h3>L4 用户路径</h3><p>UI、API、持久化、权限、失败和恢复。</p></div>
+<div class="card"><h3>L5 交付</h3><p>版本、文档、许可证、回滚和复现。</p></div>
+</div>
+<div class="tip"><b>验收结论：</b>PASS 表示全部 Must 有证据且没有 Critical/High 缺陷；FAIL 表示功能错误或 Must 未满足；BLOCKED 表示环境阻断了有意义的测试。</div>
+</section>
+
+<section id="change"><h2>9. 变更和故障怎么办</h2>
+<div class="flow" aria-label="变更与故障处理逻辑图">
+<div class="flow-row"><span class="flow-num">1</span><div class="flow-body"><b>登记问题或变更</b><small>监理先记录影响、风险和验收方式。</small></div></div>
+<div class="flow-row"><span class="flow-num">2</span><div class="flow-body"><b>判断基线影响</b><small>是否改变需求、API、数据、权限、部署或验收。</small></div></div>
+<div class="flow-row"><span class="flow-num">3</span><div class="flow-body"><b>更新需求 / 设计</b><small>必要时更新契约、SRS、SDD/ADR 和迁移。</small></div></div>
+<div class="flow-row"><span class="flow-num">4</span><div class="flow-body"><b>用户批准关键变化</b><small>改变范围、成本、权限或验收时必须确认。</small></div></div>
+<div class="flow-row"><span class="flow-num">5</span><div class="flow-body"><b>实现与回归</b><small>工程师列回归清单，补最小资格测试。</small></div></div>
+<div class="flow-row"><span class="flow-num">6</span><div class="flow-body"><b>重新对齐与复测</b><small>项目经理检查，测试复测受影响范围。</small></div></div>
+<div class="flow-row"><span class="flow-num">7</span><div class="flow-body"><b>闭环</b><small>记录缺陷、修复、证据、残余风险和经验。</small></div></div>
+</div>
+<div class="danger"><b>防假完成：</b>旧功能不能因为新功能上线而悄悄消失。回归要有自动化资格测试，并说明“修复前失败、修复后通过”。</div>
+</section>
+
+<section id="release"><h2>10. 发布规则</h2>
+<div class="note"><b>默认不发布。</b>发布、部署、上传、重启服务或写外部系统，都需要用户明确授权。</div>
+<div class="table-scroll"><table><thead><tr><th>阶段</th><th>做什么</th><th>不能做什么</th></tr></thead><tbody>
+<tr><td>授权登记</td><td>监理记录版本范围、授权和排除项。</td><td>不能把聊天里的暗示当成发布命令。</td></tr>
+<tr><td>发布准备</td><td>项目经理形成清单、说明、风险和回滚。</td><td>不能把真实数据、秘密或内部记录塞进包里。</td></tr>
+<tr><td>资产准备</td><td>源代码、锁文件、迁移/配置模板和必要文档。</td><td>不能缺少回滚方案。</td></tr>
+<tr><td>发布烟测</td><td>测试关键用户路径和回滚路径。</td><td>不能用旧报告替代本轮烟测。</td></tr>
+<tr><td>交付归档</td><td>结果写入 release 和阶段目录。</td><td>不能自动部署或上传。</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="faq"><h2>11. 常见误区</h2>
+<div class="card-grid">
+<div class="card"><h3>“代码存在 = 完成”</h3><p>错。还要看用户路径、错误、持久化和证据。</p></div>
+<div class="card"><h3>“单测过了 = 验收”</h3><p>错。单测不能替代独立功能验收。</p></div>
+<div class="card"><h3>“HTTP 200 = 正确”</h3><p>错。要检查状态、正文、页面状态和数据库结果。</p></div>
+<div class="card"><h3>“AI 说完成 = 完成”</h3><p>错。要看证据、命令、失败项和未执行项。</p></div>
+<div class="card"><h3>“测试通过 = 可以发布”</h3><p>错。发布还需要用户明确授权。</p></div>
+<div class="card"><h3>“旧功能还在底层 = 没丢”</h3><p>错。用户可达入口消失，也算回归。</p></div>
+</div>
+</section>
+
+<section id="weekly"><h2>12. 一周演练</h2>
+<div class="table-scroll"><table><thead><tr><th>时间</th><th>练习</th><th>目标</th></tr></thead><tbody>
+<tr><td>周一</td><td>选一个小需求，走监理登记和需求发现。</td><td>会写范围、失败行为和验收。</td></tr>
+<tr><td>周二</td><td>形成最小 PRD/SRS。</td><td>每个 Must 都能验证。</td></tr>
+<tr><td>周三</td><td>做一次小架构评审。</td><td>明确模块、接口、数据和回滚。</td></tr>
+<tr><td>周四</td><td>实现最小垂直切片。</td><td>契约、领域、适配器、API/UI 分层清楚。</td></tr>
+<tr><td>周五</td><td>做符合性检查和独立验收。</td><td>会用 PASS/FAIL/BLOCKED。</td></tr>
+<tr><td>周末</td><td>复盘日志、证据和风险。</td><td>知道下一步和缺口。</td></tr>
+</tbody></table></div>
+</section>
+
+<section id="checklist"><h2>13. 收尾清单</h2>
+<ul>
+<li>需求逐条有状态，范围外事项没有被静默实现。</li>
+<li>文件有责任目录和日期化命名，无机器绝对路径和敏感信息。</li>
+<li>实现和测试证据真实存在，失败、阻塞和未执行项已记录。</li>
+<li>用户可见路径、错误、权限、持久化和恢复已验证。</li>
+<li>文档、配置、迁移和功能登记已同步。</li>
+<li>项目经理符合性检查和独立测试结论清楚。</li>
+<li>日志、质量、变更、成本记录齐全。</li>
+<li>PASS 不等于正式验收；发布仍需用户明确授权。</li>
+</ul>
+<div class="tip"><b>最快判断法：</b>如果你不能回答“谁确认、谁批准、谁验收、谁授权发布、证据在哪”，就还没完成。</div>
+</section>
+
+<section id="sources"><h2>14. 来源与边界</h2>
+<p>本手册是通俗解释层，不替代权威规则。冲突时以当前项目 <code>AGENTS.md</code> 和源 Markdown 为准。</p>
+<div class="table-scroll"><table><thead><tr><th>来源</th><th>用途</th></tr></thead><tbody>
+<tr><td><a href="20260915-软件项目Agent协作-流程说明.md">20260915-软件项目Agent协作-流程说明.md</a></td><td>当前流程权威基线。</td></tr>
+<tr><td><a href="../../../AGENTS.md">根级 AGENTS.md</a></td><td>项目监理、角色路由、目录边界和授权。</td></tr>
+<tr><td><a href="../../project/AGENTS.md">工程级 AGENTS.md</a></td><td>代码、测试、配置、迁移和工程文档边界。</td></tr>
+<tr><td><a href="../../../reference/20260910-项目经理Agent-使用说明.md">项目经理 Agent 使用说明</a></td><td>需求发现、PRD/SRS 和验收。</td></tr>
+<tr><td><a href="../../../reference/20260910-项目架构师Agent-使用说明.md">项目架构师 Agent 使用说明</a></td><td>SDD/ADR、接口、数据和迁移。</td></tr>
+<tr><td><a href="../../../reference/20260830-全栈工程师Agent-使用说明.md">全栈工程师 Agent 使用说明</a></td><td>实现、文件落位和浏览器验证。</td></tr>
+<tr><td><a href="../../../reference/20260829-项目测试Agent-使用说明.md">项目测试 Agent 使用说明</a></td><td>独立验收和证据。</td></tr>
+<tr><td><a href="../../../reference/20260904-项目Agent协作-说明.md">项目 Agent 协作说明</a></td><td>角色协作顺序。</td></tr>
+</tbody></table></div>
+<div class="note"><b>格式说明：</b>本手册借鉴现代教学手册的阅读模式：入门路径、核心模型、卡片、提示框、表格、流程图、目录和打印正文。未复制 AI4SCIENCE 手册的品牌、Logo、专有文案或受保护内容。</div>
+</section>
+
+<div class="pager"><div><b>上一节</b><a href="#checklist">收尾清单</a></div><div style="text-align:right"><b>继续阅读</b><a href="#sources">来源与边界</a></div></div>
+<div class="feedback"><span>这份手册是否帮你看懂了当前项目流程？</span><button class="button" type="button" data-feedback="yes">有帮助</button><button class="button" type="button" data-feedback="no">还要补充</button><span id="feedback-result" aria-live="polite"></span></div>
+</main>
+
+<aside class="toc" aria-label="本页目录"><strong>本页目录</strong><ul>
+<li><a href="#why">1. 它解决什么问题</a></li>
+<li><a href="#quick-start">2. 快速开始</a></li>
+<li><a href="#core-model">3. 10 分钟核心模型</a></li>
+<li><a href="#workflow">4. 全流程</a></li>
+<li><a href="#gates">5. 五个关键关口</a></li>
+<li><a href="#roles">6. 角色怎么做</a></li>
+<li><a href="#records">7. 记录放在哪里</a></li>
+<li><a href="#quality">8. 质量怎么判</a></li>
+<li><a href="#change">9. 变更和故障</a></li>
+<li><a href="#release">10. 发布规则</a></li>
+<li><a href="#faq">11. 常见误区</a></li>
+<li><a href="#weekly">12. 一周演练</a></li>
+<li><a href="#checklist">13. 收尾清单</a></li>
+<li><a href="#sources">14. 来源与边界</a></li>
+</ul></aside>
+</div>
+
+<footer class="page-footer">AI4PROGRAMMING 通俗版项目手册 · 2026-09-16 · 本手册是解释材料，不包含已完成产品验收或发布批准；规则冲突以源 Markdown 和根级 AGENTS.md 为准。</footer>
+<script>
+(function(){
+var root=document.documentElement,stored=localStorage.getItem('ai4programming-handbook-theme');
+if(stored==='dark'||(!stored&&matchMedia('(prefers-color-scheme: dark)').matches))root.dataset.theme='dark';
+document.getElementById('theme').onclick=function(){root.dataset.theme=root.dataset.theme==='dark'?'light':'dark';localStorage.setItem('ai4programming-handbook-theme',root.dataset.theme)};
+document.getElementById('print').onclick=function(){window.print()};
+document.getElementById('copy').onclick=function(){var text=Array.from(document.querySelectorAll('main h2')).map(function(h){return h.innerText}).join('\n');navigator.clipboard.writeText(text);this.textContent='已复制';var b=this;setTimeout(function(){b.textContent='复制页面要点'},1600)};
+var links=Array.from(document.querySelectorAll('.sidebar a,.toc a,.top-links a')),targets=links.map(function(a){return document.querySelector(a.hash)}).filter(Boolean);
+function highlight(){var current=targets[0];targets.forEach(function(t){if(t.getBoundingClientRect().top<=125)current=t});links.forEach(function(a){a.classList.toggle('active',a.hash==='#'+current.id)})}addEventListener('scroll',highlight,{passive:true});highlight();
+document.querySelectorAll('[data-feedback]').forEach(function(b){b.onclick=function(){document.getElementById('feedback-result').textContent=b.dataset.feedback==='yes'?'谢谢，已记录。':'建议先看“10 分钟核心模型”，再回到全流程。'}});
+})();
+</script>
+</body>
+</html>
+
+
+

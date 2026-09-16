@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8"><link rel="icon" href="data:,">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><文档或知识门户标题></title>
+  <meta name="description" content="<页面摘要>">
+  <style>
+    /* 要求：离线单文件；无运行时 CDN；实现浅/深主题、焦点态、响应式和打印样式。 */
+    :root { color-scheme: light dark; --bg:#fff; --panel:#fff; --text:#111827; --muted:#545e6b; --line:#e3e6eb; --brand:#2563eb; --brand-soft:#eef4ff; }
+    html[data-theme=dark] { --bg:#0b0f16; --panel:#111827; --text:#edf1f7; --muted:#b7c0cd; --line:#3d4859; --brand:#7ab2ff; --brand-soft:#172337; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font-family:"Segoe UI","Microsoft YaHei",sans-serif; line-height:1.72; }
+    a { color:var(--brand); }
+    :focus-visible { outline:3px solid var(--brand); outline-offset:2px; }
+    .skip { position:absolute; left:-999px; }
+    .skip:focus { left:16px; top:12px; z-index:10; }
+    .topbar { border-bottom:1px solid var(--line); }
+    .topbar-inner { max-width:1440px; margin:auto; display:flex; align-items:center; gap:16px; padding:12px 28px; }
+    .layout { max-width:1440px; margin:auto; display:grid; grid-template-columns:280px minmax(0,760px) 220px; gap:32px; padding:28px; }
+    .sidebar, .toc { position:sticky; top:90px; }
+    .doc-page[hidden] { display:none; }
+    .logic-map { border:1px solid var(--line); border-left:3px solid var(--brand); border-radius:12px; background:var(--panel); padding:16px; }
+    .logic-step { display:grid; grid-template-columns:28px minmax(0,1fr); gap:10px; padding-bottom:12px; }
+    .table-wrap, .code-wrap { overflow:auto; max-width:100%; }
+    @media (max-width:1220px) { .toc { display:none; } }
+    @media (max-width:900px) { .layout { grid-template-columns:1fr; } .sidebar { display:none; } .sidebar.open { display:block; position:fixed; inset:0 auto 0 0; width:300px; } }
+    @media print { .topbar,.sidebar,.toc,button { display:none !important; } .layout { display:block; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content-area">跳到正文</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand"><span><文档或项目短名> Docs</span></div>
+      <label class="search"><span aria-hidden="true">⌕</span><input type="search" aria-label="搜索文档" placeholder="搜索文档"><kbd>Ctrl K</kbd></label>
+      <button type="button" data-theme-toggle>切换主题</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar" aria-label="文档导航">
+      <h2><文档分组></h2>
+      <a href="#doc-id"><文档标题></a>
+    </nav>
+
+    <main id="content-area">
+      <article class="doc-page" id="doc-id" data-id="doc-id" data-title="<文档标题>">
+        <header>
+          <p class="eyebrow"><分类></p>
+          <h1><文档标题></h1>
+          <p><一句话摘要。</p>
+          <button type="button" data-copy-page>复制本页</button>
+        </header>
+
+        <dl class="meta-strip">
+          <div><dt>来源文件</dt><dd><code><源Markdown相对路径></code></dd></div>
+          <div><dt>呈现方式</dt><dd>静态整合页</dd></div>
+          <div><dt>事实源</dt><dd>Markdown 原文</dd></div>
+        </dl>
+
+        <section class="logic-map" aria-labelledby="doc-id-logic-title">
+          <p class="logic-eyebrow">Logic map <span class="logic-count">共 <N> 步</span></p>
+          <h2 id="doc-id-logic-title"><文档逻辑图标题></h2>
+          <ol class="logic-flow">
+            <li class="logic-step">
+              <span class="logic-step-num">1</span>
+              <span class="logic-node"><strong><节点标题></strong><small><节点职责或判断条件></small></span>
+            </li>
+          </ol>
+          <p class="logic-caption"><来源说明>；本图为展示层归纳，详细规则以源文档为准。</p>
+        </section>
+
+        <div class="content-body">
+          <h2><章节标题></h2>
+          <p><由源Markdown转换或选择性摘要的正文。></p>
+        </div>
+
+        <footer><p>本页由 Markdown 源文档生成；如内容冲突，以源 Markdown 和项目规则为准。</p></footer>
+      </article>
+    </main>
+
+    <aside class="toc" aria-label="页内大纲">
+      <h2>本页目录</h2>
+      <ul><li><a href="#section-id"><章节标题></a></li></ul>
+    </aside>
+  </div>
+
+  <script>
+    /* 要求：只实现页面切换、搜索、主题、目录、复制和键盘导航；不访问外部服务。 */
+  </script>
+</body>
+</html>
+
+
+

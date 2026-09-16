@@ -1,0 +1,7 @@
+interface:
+  display_name: "通用文档HTML呈现"
+  short_description: "项目监理把Markdown、文本、既有HTML或经批准提取的DOCX/PDF转为离线HTML门户。"
+  default_prompt: "由 pr-ps-00-project-supervisor 使用 $ps-10-document-html-presentation，将已登记文档源转换为可审阅HTML。"
+
+policy:
+  allow_implicit_invocation: false
