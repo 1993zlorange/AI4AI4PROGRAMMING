@@ -25,15 +25,25 @@
     "storage",
     "tests"
   ],
-  "functional_extensions": [".py", ".ts", ".tsx", ".js", ".jsx"],
+  "functional_extensions": [
+    ".py",
+    ".ts",
+    ".tsx",
+    ".js",
+    ".jsx"
+  ],
   "features": [
     {
       "feature_id": "F001",
       "feature_code": "GOVERNANCE_VALIDATE",
       "feature_name": "项目治理校验",
       "owner": "项目监理、工程师",
-      "implementation_paths": ["scripts/f001_governance_validate.py"],
-      "test_paths": ["tests/test_f001_governance_validate.py"],
+      "implementation_paths": [
+        "scripts/f001_governance_validate.py"
+      ],
+      "test_paths": [
+        "tests/test_f001_governance_validate.py"
+      ],
       "status": "active"
     },
     {
@@ -41,9 +51,130 @@
       "feature_code": "SKILL_PROMOTION_AUDIT",
       "feature_name": "Skill 晋升审计",
       "owner": "项目监理、工程师",
-      "implementation_paths": ["scripts/f002_skill_promotion_audit.py"],
-      "test_paths": ["tests/test_f002_skill_promotion_audit.py"],
+      "implementation_paths": [
+        "scripts/f002_skill_promotion_audit.py"
+      ],
+      "test_paths": [
+        "tests/test_f002_skill_promotion_audit.py"
+      ],
       "status": "active"
     }
-  ]
+  ],
+  "record_policy": {
+    "effective_date": "2026-10-29",
+    "timezone": "Asia/Shanghai",
+    "project_id": "projectname",
+    "profile": "software",
+    "legacy_paths": [],
+    "current_artifacts": {},
+    "types": {
+      "requirement": {
+        "aliases": [
+          "需求",
+          "要求记录",
+          "需求记录",
+          "requirement"
+        ],
+        "directory": "projectname/achieve/00-项目管理/requirements",
+        "filename_body": "用户要求",
+        "label": "需求记录"
+      },
+      "supervision": {
+        "aliases": [
+          "监督简报",
+          "监督记录",
+          "supervision"
+        ],
+        "directory": "projectname/achieve/00-项目管理/supervision",
+        "filename_body": "项目监督",
+        "label": "监督记录"
+      },
+      "log": {
+        "aliases": [
+          "项目日志",
+          "工作日志",
+          "日志",
+          "log"
+        ],
+        "directory": "projectname/achieve/00-项目管理/logs",
+        "filename_body": "项目进度",
+        "label": "日志"
+      },
+      "reflection": {
+        "aliases": [
+          "问题反思",
+          "反思记录",
+          "反思",
+          "reflection"
+        ],
+        "directory": "projectname/achieve/00-项目管理/reflections",
+        "filename_body": "问题改进",
+        "label": "反思"
+      },
+      "change": {
+        "aliases": [
+          "变更说明",
+          "发布变更记录",
+          "变更记录",
+          "change"
+        ],
+        "directory": "projectname/achieve/00-项目管理/changes",
+        "filename_body": "项目变更",
+        "label": "变更记录"
+      },
+      "cost": {
+        "aliases": [
+          "成本",
+          "成本时间统计",
+          "统计",
+          "成本记录",
+          "cost"
+        ],
+        "directory": "projectname/achieve/00-项目管理/costs",
+        "filename_body": "资源消耗",
+        "label": "成本记录"
+      },
+      "quality": {
+        "aliases": [
+          "质量检查",
+          "质量门禁",
+          "质量记录",
+          "quality"
+        ],
+        "directory": "projectname/achieve/00-项目管理/quality",
+        "filename_body": "质量检查",
+        "label": "质量记录"
+      },
+      "work-contract": {
+        "aliases": [
+          "工作范围记录",
+          "工作契约",
+          "work-contract"
+        ],
+        "directory": "projectname/achieve/03-测试与验收",
+        "filename_body": "项目工作",
+        "label": "工作契约"
+      },
+      "handoff": {
+        "aliases": [
+          "交接记录",
+          "交接书",
+          "handoff"
+        ],
+        "directory": "projectname/achieve/04-交付与阶段",
+        "filename_body": "项目交接",
+        "label": "交接书"
+      },
+      "decision": {
+        "aliases": [
+          "决定记录",
+          "人工决定",
+          "decision"
+        ],
+        "directory": "projectname/achieve/04-交付与阶段",
+        "filename_body": "项目决定",
+        "label": "人工决定"
+      }
+    }
+  }
 }

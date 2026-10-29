@@ -96,6 +96,23 @@ bun test
 
 依赖方向固定为：`web -> contracts/sdk -> api -> application -> domain`；基础设施通过 `ports -> adapters` 接入。前端不得直连数据库，`domain` 不得依赖 HTTP、ORM、环境变量或具体供应商 SDK。详见 [AGENTS.md](AGENTS.md) 和 [PROGRAMMING_STANDARDS.md](PROGRAMMING_STANDARDS.md)。
 
+## 记录与任务接续
+
+软件实现、必要测试和运行产物留在工程目录，正式文档从根README的当前入口访问。不要在 `output` 外另建平行的临时证据体系，也不把工程检查通过数当作用户任务成果。
+
+- 过程记录按 `config/feature-registry.yaml` 中 `record_policy` 的固定日文件追加，唯一键为项目、上海记录日和规范类型；任务、Agent、模块与格式都不拆文件。
+- 写入者先定位当天母版，按稳定条目ID和事件/尝试去重，冲突重读合并；无实际条目不建文件。原始run及正式实体文档不强行归并。
+- 已授权任务中的必要修复、剩余单元、恢复和汇总接续执行；长任务逐单元保存终态/断点，工具等待结束不写成任务失败。
+
+模板提供的可执行只读检查（从本目录执行）：
+
+```bash
+python scripts/f001_governance_validate.py --project-root ../.. --check
+python -m unittest discover -s tests -v
+```
+
+具体日文件结构、归属、历史边界与内部证据要求以[根级规则](../../AGENTS.md#54-同日同类型记录的唯一文件)为准。业务工具链尚未实现，以上模板检查不代表产品或正式验收通过。
+
 ## 配置与秘密
 
 - 可提交的默认值放在 `config/environments/*.example`。

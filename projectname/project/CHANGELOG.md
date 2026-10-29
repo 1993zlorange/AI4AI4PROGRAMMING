@@ -4,4 +4,6 @@
 
 ## Unreleased
 
+- 2026-10-29：过程记录按同项目/上海记录日/规范类型归并；新增F001活动日文件、条目与当前入口检查；同一授权任务支持必要修复、断点恢复和汇总接续，工程检查证据默认内部化。
+
 - Template scaffold created; no product behavior implemented.

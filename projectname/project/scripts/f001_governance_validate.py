@@ -10,6 +10,7 @@ import json
 import re
 import sys
 import tomllib
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -223,13 +224,241 @@ def validate_documents(project_root: Path, config: dict[str, object]) -> list[st
     return errors
 
 
+
+
+def record_metadata(text: str) -> dict[str, str]:
+    """读取日记录使用的简单标量 frontmatter，不执行 YAML 对象。"""
+    if not text.startswith("---\n"):
+        return {}
+    front, separator, _ = text[4:].partition("\n---")
+    if not separator:
+        return {}
+    result: dict[str, str] = {}
+    for line in front.splitlines():
+        key, colon, value = line.partition(":")
+        if colon and re.fullmatch(r"[a-z_]+", key.strip()):
+            result[key.strip()] = value.strip().strip("\"'")
+    return result
+
+
+def record_aliases(policy: dict[str, Any]) -> tuple[dict[str, str], list[str]]:
+    """将同用途类型归一；配置中同一别名不能指向两个类型。"""
+    aliases: dict[str, str] = {}
+    errors: list[str] = []
+    types = policy.get("types", {})
+    if not isinstance(types, dict):
+        return {}, ["record_policy.types 必须是对象"]
+    for canonical, item in types.items():
+        if not isinstance(item, dict):
+            errors.append(f"记录类型配置无效：{canonical}")
+            continue
+        values = [canonical, item.get("label", "")] + list(item.get("aliases", []))
+        for alias in values:
+            if not isinstance(alias, str) or not alias:
+                continue
+            previous = aliases.setdefault(alias.casefold(), canonical)
+            if previous != canonical:
+                errors.append(f"记录类型别名冲突：{alias}")
+    return aliases, errors
+
+
+def artifact_target(project_root: Path, reference: str) -> tuple[Path, str]:
+    """把文件与锚点分开解析，并拒绝越出当前项目。"""
+    relative, _, anchor = reference.partition("#")
+    return resolve_inside(project_root, relative, "current_artifacts"), anchor
+
+
+def validate_current_artifacts(project_root: Path, policy: dict[str, Any]) -> list[str]:
+    """每种当前成果只有一个可解析目标，既有历史链接不在此补写。"""
+    entries = policy.get("current_artifacts", {})
+    if not isinstance(entries, dict):
+        return ["record_policy.current_artifacts 必须是对象"]
+    errors: list[str] = []
+    for kind, reference in entries.items():
+        if not isinstance(reference, str) or not reference.strip():
+            errors.append(f"当前成果入口必须为唯一相对路径：{kind}")
+            continue
+        target, anchor = artifact_target(project_root, reference)
+        if not target.is_file():
+            errors.append(f"当前成果入口不存在：{kind} -> {reference}")
+        elif anchor:
+            text = target.read_text(encoding="utf-8-sig")
+            if not re.search(r'id=[\"\']' + re.escape(anchor) + r'[\"\']', text):
+                errors.append(f"当前成果入口锚点不存在：{reference}")
+    return errors
+
+
+def recorded_day(value: str) -> str:
+    """由带时区时间取得上海记录日，不依赖执行主机本地时区。"""
+    moment = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if moment.utcoffset() is None:
+        raise ValueError("记录时间缺少时区")
+    return moment.astimezone(timezone(timedelta(hours=8))).date().isoformat()
+
+
+def validate_daily_records(project_root: Path, config: dict[str, object]) -> list[str]:
+    """F001: 校验当前日记录的唯一落点、条目身份与真实记录日。"""
+    registry = load_json_file(
+        resolve_inside(project_root, config.get("record_policy_registry", config.get("feature_registry")), "record_policy_registry"),
+        "日记录配置",
+    )
+    policy = registry.get("record_policy")
+    if policy is None:
+        return []
+    if not isinstance(policy, dict):
+        return ["record_policy 必须是对象"]
+    aliases, errors = record_aliases(policy)
+    try:
+        effective = date.fromisoformat(str(policy["effective_date"]))
+    except (KeyError, ValueError):
+        return errors + ["record_policy.effective_date 必须为真实日期"]
+    if policy.get("timezone") != "Asia/Shanghai" or not policy.get("project_id"):
+        errors.append("日记录配置必须声明project_id与Asia/Shanghai时区")
+    errors.extend(validate_current_artifacts(project_root, policy))
+    types = policy.get("types", {})
+    if not isinstance(types, dict):
+        return errors
+    legacy_values = policy.get("legacy_paths", [])
+    if not isinstance(legacy_values, list):
+        return errors + ["legacy_paths必须为精确历史文件数组"]
+    legacy_paths: list[Path] = []
+    for item in legacy_values:
+        old = resolve_inside(project_root, item, "legacy_paths")
+        if not old.is_file():
+            errors.append(f"legacy_paths仅允许存在的精确文件，不能豁免目录或未来新稿：{item}")
+        else:
+            legacy_paths.append(old)
+    targets: dict[tuple[str, str, str], Path] = {}
+    entry_ids: set[str] = set()
+    events: set[tuple[str, str, str]] = set()
+    for path in project_root.rglob("*"):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(project_root)
+        if any(part in (IGNORED_PARTS - {"output"}) | {"release"} for part in relative.parts):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8-sig")
+        except UnicodeError:
+            # 非文本原件/媒体不是可编辑日记录；其来源由正式交付入口管理。
+            continue
+        metadata = record_metadata(text)
+        schema = metadata.get("schema_version", "")
+        declared = schema.startswith("daily-record/")
+        # output仅豁免原始运行对象；显式日记录不能通过藏入trace目录拆分。
+        if "output" in relative.parts and not declared:
+            continue
+        registered_legacy = path.resolve() in legacy_paths
+        date_match = re.match(r"^(\d{8})-", path.name)
+        inferred = next((canonical for alias, canonical in sorted(aliases.items(), key=lambda pair: -len(pair[0])) if path.stem.casefold() == alias or path.stem.casefold().endswith("-" + alias)), None)
+        if not declared:
+            if not inferred:
+                continue
+            if not date_match:
+                if not registered_legacy:
+                    errors.append(f"已识别记录类型缺少规范日期且未登记历史来源：{relative.as_posix()}")
+                continue
+            try:
+                dated = datetime.strptime(date_match.group(1), "%Y%m%d").date()
+            except ValueError:
+                errors.append(f"日记录日期无效：{relative.as_posix()}")
+                continue
+            if dated < effective or registered_legacy:
+                continue
+            errors.append(f"启用后的记录缺少daily-record/1.0元数据：{relative.as_posix()}")
+            continue
+        if schema != "daily-record/1.0":
+            errors.append(f"不支持的日记录schema：{relative.as_posix()}")
+            continue
+        canonical = aliases.get(metadata.get("record_type", metadata.get("canonical_record_type", "")).casefold())
+        if canonical is None:
+            errors.append(f"未知日记录类型：{relative.as_posix()}")
+            continue
+        try:
+            day = date.fromisoformat(metadata.get("record_date", "")).isoformat()
+        except ValueError:
+            errors.append(f"日记录日期无效：{relative.as_posix()}")
+            continue
+        if (metadata.get("timezone") != "Asia/Shanghai"
+                or metadata.get("project_id") != policy.get("project_id")
+                or metadata.get("record_profile") != policy.get("profile")):
+            errors.append(f"日记录项目/时区/profile与配置不一致：{relative.as_posix()}")
+        archived = metadata.get("record_state") == "archived"
+        if archived and not registered_legacy:
+            errors.append(f"归档日记录未登记精确历史原件，不能自标归档豁免：{relative.as_posix()}")
+        readonly = (archived and registered_legacy) or bool(metadata.get("derived_from"))
+        if metadata.get("derived_from"):
+            source, _ = artifact_target(project_root, metadata["derived_from"])
+            if not source.is_file() or source.resolve() == path.resolve():
+                errors.append(f"日记录导出来源无效：{relative.as_posix()}")
+            else:
+                source_metadata = record_metadata(source.read_text(encoding="utf-8-sig"))
+                source_type = aliases.get(source_metadata.get("record_type", "").casefold())
+                if (source_metadata.get("schema_version") != "daily-record/1.0"
+                        or source_metadata.get("derived_from") or source_type != canonical
+                        or source_metadata.get("record_date") != day
+                        or source_metadata.get("project_id") != metadata.get("project_id")
+                        or source_metadata.get("record_profile") != metadata.get("record_profile")):
+                    errors.append(f"日记录导出来源身份不匹配：{relative.as_posix()}")
+        if readonly:
+            continue
+        definition = types[canonical]
+        directory = resolve_inside(project_root, definition.get("directory"), "record_type.directory")
+        filename = f"{day.replace('-', '')}-{definition.get('filename_body')}-{definition.get('label')}.md"
+        if path.resolve() != (directory / filename).resolve():
+            errors.append(f"日记录不在唯一规范落点：{relative.as_posix()}")
+        key = (str(policy["project_id"]), day, canonical)
+        if key in targets:
+            errors.append(f"同日同类型存在多个可写文件：{relative.as_posix()} / {targets[key].relative_to(project_root).as_posix()}")
+        targets[key] = path
+        matches = re.findall(r"<!--\s*daily-entry\s+(\{.*?\})\s*-->", text, re.DOTALL)
+        if not matches:
+            errors.append(f"日记录没有真实独立条目：{relative.as_posix()}")
+        for raw in matches:
+            try:
+                entry = json.loads(raw)
+            except json.JSONDecodeError:
+                errors.append(f"日记录条目JSON无效：{relative.as_posix()}")
+                continue
+            if not isinstance(entry, dict):
+                errors.append(f"日记录条目不是对象：{relative.as_posix()}")
+                continue
+            entry_id = entry.get("entry_id")
+            if not isinstance(entry_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:-]*", entry_id):
+                errors.append(f"日记录条目ID无效：{relative.as_posix()}")
+                continue
+            if entry_id in entry_ids:
+                errors.append(f"重复日记录条目ID：{entry_id}")
+            entry_ids.add(entry_id)
+            anchor = "entry-" + entry_id
+            if len(re.findall(r'id=[\"\']' + re.escape(anchor) + r'[\"\']', text)) != 1:
+                errors.append(f"日记录条目锚点缺失或重复：{entry_id}")
+            event = entry.get("event_key")
+            if not isinstance(event, str) or not event:
+                errors.append(f"日记录条目缺少event_key：{entry_id}")
+            else:
+                event_key = (canonical, event, str(entry.get("attempt_id", "")))
+                if event_key in events:
+                    errors.append(f"重复日记录事件：{event}")
+                events.add(event_key)
+            try:
+                if recorded_day(str(entry.get("recorded_at", ""))) != day:
+                    errors.append(f"日记录条目记录日不一致：{entry_id}")
+                if entry.get("occurred_at"):
+                    recorded_day(str(entry["occurred_at"]))
+            except ValueError:
+                errors.append(f"日记录条目时间无效：{entry_id}")
+    return errors
+
+
 def run(project_root: Path) -> int:
     """执行只读治理检查并返回稳定退出码。"""
     try:
         config = load_project_config(project_root)
         feature_errors, engineering_root = validate_features(project_root, config)
-        errors = feature_errors + validate_layout(project_root, config, engineering_root) + validate_documents(project_root, config)
-    except (GovernanceValidationError, OSError) as exc:
+        errors = (feature_errors + validate_layout(project_root, config, engineering_root)
+                  + validate_documents(project_root, config) + validate_daily_records(project_root, config))
+    except (GovernanceValidationError, OSError, UnicodeError, TypeError) as exc:
         errors = [str(exc)]
     for message in errors:
         print(f"ERROR: {message}")
