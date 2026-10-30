@@ -39,7 +39,12 @@
       "feature_name": "项目治理校验",
       "owner": "项目监理、工程师",
       "implementation_paths": [
-        "scripts/f001_governance_validate.py"
+        "scripts/f001_governance_validate.py",
+        "docs/README.md",
+        "docs/项目技术说明.md",
+        "docs/使用指南.md",
+        "docs/结果说明与适用范围.md",
+        "PROGRAMMING_STANDARDS.md"
       ],
       "test_paths": [
         "tests/test_f001_governance_validate.py",
@@ -191,22 +196,212 @@
     "root": "docs",
     "root_entries": [
       "README.md",
-      "api.md",
-      "architecture.md"
+      "项目技术说明.md",
+      "使用指南.md",
+      "结果说明与适用范围.md"
     ],
-    "stable_directories": [
-      "interfaces",
-      "commands",
-      "algorithms",
-      "adr"
-    ],
-    "pinned_paths": {},
+    "stable_directories": [],
+    "pinned_paths": {
+      "docs/api/README.md": "ff2a3e7376d03ed9312d7ceecc00298c8cca95072beb9ddcf49e29f12ce7f7ad",
+      "docs/architecture/README.md": "ab484f06c8515d2ab64849168c30ddfe582722a9426cc3429e42484817887023",
+      "docs/development/README.md": "9dc0c76eaeafdfcaa4a8fb72752a4cbdc2628ff2d0ad52d8e66e095bcaa369ca",
+      "docs/operations/README.md": "73fb03ace01e854aa26b01883298df82d71a0bb60072738a3bfc707a03491491"
+    },
     "baseline_paths": [
-      "docs/adr/.gitkeep",
-      "docs/api/README.md",
-      "docs/architecture/README.md",
-      "docs/development/README.md",
-      "docs/operations/README.md"
+      "docs/adr/.gitkeep"
+    ],
+    "profile": "reader",
+    "delivery_state": "ready"
+  },
+  "achievement_layout": {
+    "enabled": true,
+    "roots": [
+      {
+        "path": "../achieve/01-需求与产品",
+        "entry_filenames": [
+          "README.md"
+        ],
+        "folders": {
+          "产品需求": {
+            "purpose": "产品需求专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          },
+          "使用场景": {
+            "purpose": "使用场景专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          },
+          "功能范围": {
+            "purpose": "功能范围专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          }
+        },
+        "baseline_paths": []
+      },
+      {
+        "path": "../achieve/02-架构与设计",
+        "entry_filenames": [
+          "README.md"
+        ],
+        "folders": {
+          "系统设计": {
+            "purpose": "系统设计专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          },
+          "接口设计": {
+            "purpose": "接口设计专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          },
+          "架构决定": {
+            "purpose": "架构决定专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          }
+        },
+        "baseline_paths": []
+      },
+      {
+        "path": "../achieve/03-测试与验收",
+        "entry_filenames": [
+          "README.md"
+        ],
+        "folders": {
+          "独立验收": {
+            "purpose": "独立验收专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          },
+          "验收材料": {
+            "purpose": "验收材料专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          }
+        },
+        "baseline_paths": [
+          "20261012-Axiom-reporter项目安装-功能测试报告.md"
+        ]
+      },
+      {
+        "path": "../achieve/04-交付与阶段",
+        "entry_filenames": [
+          "README.md"
+        ],
+        "folders": {
+          "用户手册": {
+            "purpose": "用户手册专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          },
+          "版本交付": {
+            "purpose": "版本交付专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          },
+          "发布说明": {
+            "purpose": "发布说明专题成果，按稳定对象维护",
+            "object_entry_filenames": [
+              "README.md"
+            ],
+            "object_child_folders": {
+              "可编辑源": "同一对象可编辑工程与支持资源",
+              "figures": "对象专用图片，共用母版另存唯一位置",
+              "附件": "用户要求的问答、评审及附属材料",
+              "历史版本": "已核定被替代的只读版本"
+            }
+          }
+        },
+        "baseline_paths": [
+          "20260913-AI4PROGRAMMING模板v0.1.0-发布说明.md",
+          "20260915-软件项目Agent协作-流程说明.md",
+          "20260916-软件项目Agent协作-流程说明.html",
+          "20260916-软件项目Agent协作-通俗易懂手册.html"
+        ]
+      }
+    ],
+    "rejected_types": [
+      "修改说明",
+      "逐句对照",
+      "编译检查",
+      "检查记录",
+      "修订记录",
+      "整合记录",
+      "工作契约",
+      "成果卡",
+      "交接书"
     ]
   }
 }
