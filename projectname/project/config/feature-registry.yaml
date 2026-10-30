@@ -42,7 +42,8 @@
         "scripts/f001_governance_validate.py"
       ],
       "test_paths": [
-        "tests/test_f001_governance_validate.py"
+        "tests/test_f001_governance_validate.py",
+        "tests/test_technical_document_routing.py"
       ],
       "status": "active"
     },
@@ -175,6 +176,37 @@
         "filename_body": "项目决定",
         "label": "人工决定"
       }
-    }
+    },
+    "log_contract": "group-meeting/1.0",
+    "log_contract_effective_date": "2026-10-30",
+    "process_record_profile": "minimal",
+    "enabled_daily_types": [
+      "requirement",
+      "log"
+    ],
+    "minimal_records_effective_date": "2026-10-30"
+  },
+  "technical_documents": {
+    "enabled": true,
+    "root": "docs",
+    "root_entries": [
+      "README.md",
+      "api.md",
+      "architecture.md"
+    ],
+    "stable_directories": [
+      "interfaces",
+      "commands",
+      "algorithms",
+      "adr"
+    ],
+    "pinned_paths": {},
+    "baseline_paths": [
+      "docs/adr/.gitkeep",
+      "docs/api/README.md",
+      "docs/architecture/README.md",
+      "docs/development/README.md",
+      "docs/operations/README.md"
+    ]
   }
 }

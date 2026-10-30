@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 import tomllib
@@ -42,7 +43,9 @@ class GovernanceValidationError(ValueError):
 def parse_args() -> argparse.Namespace:
     """解析显式项目根；工具只读，保留 --check 作为统一入口。"""
     parser = argparse.ArgumentParser(description="F001 项目治理只读校验器")
-    parser.add_argument("--project-root", type=Path, required=True, help="包含根级 AGENTS.md 的项目根")
+    parser.add_argument(
+        "--project-root", type=Path, required=True, help="包含根级 AGENTS.md 的项目根"
+    )
     parser.add_argument("--check", action="store_true", help="执行只读检查")
     return parser.parse_args()
 
@@ -53,11 +56,15 @@ def load_project_config(project_root: Path) -> dict[str, object]:
     text = agents_path.read_text(encoding="utf-8")
     match = CONFIG_PATTERN.search(text)
     if match is None:
-        raise GovernanceValidationError("根级 AGENTS.md 缺少 project-supervision 配置块")
+        raise GovernanceValidationError(
+            "根级 AGENTS.md 缺少 project-supervision 配置块"
+        )
     try:
         value = tomllib.loads(match.group(1))
     except tomllib.TOMLDecodeError as exc:
-        raise GovernanceValidationError(f"project-supervision 配置无法解析：{exc}") from exc
+        raise GovernanceValidationError(
+            f"project-supervision 配置无法解析：{exc}"
+        ) from exc
     return value
 
 
@@ -96,7 +103,9 @@ def is_within(root: Path, candidate: Path) -> bool:
     return True
 
 
-def relative_paths(value: object, label: str, engineering_root: Path) -> tuple[list[Path], list[str]]:
+def relative_paths(
+    value: object, label: str, engineering_root: Path
+) -> tuple[list[Path], list[str]]:
     """验证工程相对路径列表并返回解析路径。"""
     if not isinstance(value, list) or not value:
         return [], [f"{label} 必须是非空路径数组"]
@@ -107,24 +116,36 @@ def relative_paths(value: object, label: str, engineering_root: Path) -> tuple[l
             errors.append(f"{label} 包含无效路径")
             continue
         path = Path(item)
-        if path.is_absolute() or not is_within(engineering_root, engineering_root / path):
+        if path.is_absolute() or not is_within(
+            engineering_root, engineering_root / path
+        ):
             errors.append(f"{label} 越出工程根：{item}")
             continue
         paths.append((engineering_root / path).resolve())
     return paths, errors
 
 
-def validate_features(project_root: Path, config: dict[str, object]) -> tuple[list[str], Path]:
+def validate_features(
+    project_root: Path, config: dict[str, object]
+) -> tuple[list[str], Path]:
     """验证功能三元组、路径存在性和功能文件登记。"""
-    engineering_root = resolve_inside(project_root, config.get("engineering_root"), "engineering_root")
-    registry_path = resolve_inside(project_root, config.get("feature_registry"), "feature_registry")
+    engineering_root = resolve_inside(
+        project_root, config.get("engineering_root"), "engineering_root"
+    )
+    registry_path = resolve_inside(
+        project_root, config.get("feature_registry"), "feature_registry"
+    )
     registry = load_json_file(registry_path, "功能登记")
     required = registry.get("required_fields")
     features = registry.get("features")
     if not isinstance(required, list) or not isinstance(features, list):
-        return ["功能登记必须包含 required_fields 数组和 features 数组"], engineering_root
+        return [
+            "功能登记必须包含 required_fields 数组和 features 数组"
+        ], engineering_root
     id_pattern = re.compile(str(registry.get("feature_id_pattern", r"F\d{3}")))
-    code_pattern = re.compile(str(registry.get("feature_code_pattern", r"[A-Z][A-Z0-9_]+")))
+    code_pattern = re.compile(
+        str(registry.get("feature_code_pattern", r"[A-Z][A-Z0-9_]+"))
+    )
     seen_ids: set[str] = set()
     seen_codes: set[str] = set()
     registered_files: set[Path] = set()
@@ -135,7 +156,9 @@ def validate_features(project_root: Path, config: dict[str, object]) -> tuple[li
             continue
         missing = [field for field in required if not feature.get(field)]
         if missing:
-            errors.append(f"features[{index}] 缺少字段：{', '.join(str(item) for item in missing)}")
+            errors.append(
+                f"features[{index}] 缺少字段：{', '.join(str(item) for item in missing)}"
+            )
         feature_id = str(feature.get("feature_id", ""))
         feature_code = str(feature.get("feature_code", ""))
         if not id_pattern.fullmatch(feature_id):
@@ -149,7 +172,9 @@ def validate_features(project_root: Path, config: dict[str, object]) -> tuple[li
         seen_ids.add(feature_id)
         seen_codes.add(feature_code)
         implementation_paths, path_errors = relative_paths(
-            feature.get("implementation_paths"), f"features[{index}].implementation_paths", engineering_root
+            feature.get("implementation_paths"),
+            f"features[{index}].implementation_paths",
+            engineering_root,
         )
         test_paths, test_errors = relative_paths(
             feature.get("test_paths"), f"features[{index}].test_paths", engineering_root
@@ -157,7 +182,9 @@ def validate_features(project_root: Path, config: dict[str, object]) -> tuple[li
         errors.extend(path_errors + test_errors)
         for path in implementation_paths + test_paths:
             if not path.exists():
-                errors.append(f"features[{index}] 登记路径不存在：{path.relative_to(engineering_root).as_posix()}")
+                errors.append(
+                    f"features[{index}] 登记路径不存在：{path.relative_to(engineering_root).as_posix()}"
+                )
             registered_files.add(path)
     extensions = {str(value) for value in registry.get("functional_extensions", [])}
     for root_name in ("apps", "packages", "scripts", "database"):
@@ -165,24 +192,40 @@ def validate_features(project_root: Path, config: dict[str, object]) -> tuple[li
         if not source_root.exists():
             continue
         for path in source_root.rglob("*"):
-            if not path.is_file() or path.suffix not in extensions or any(part in IGNORED_PARTS for part in path.parts):
+            if (
+                not path.is_file()
+                or path.suffix not in extensions
+                or any(part in IGNORED_PARTS for part in path.parts)
+            ):
                 continue
             if path.resolve() not in registered_files:
-                errors.append(f"功能性文件未登记功能三元组：{path.relative_to(engineering_root).as_posix()}")
+                errors.append(
+                    f"功能性文件未登记功能三元组：{path.relative_to(engineering_root).as_posix()}"
+                )
     return errors, engineering_root
 
 
-def validate_layout(project_root: Path, config: dict[str, object], engineering_root: Path) -> list[str]:
+def validate_layout(
+    project_root: Path, config: dict[str, object], engineering_root: Path
+) -> list[str]:
     """检查工程顶层目录允许列表和必要治理资产。"""
     errors: list[str] = []
-    registry_path = resolve_inside(project_root, config.get("feature_registry"), "feature_registry")
+    registry_path = resolve_inside(
+        project_root, config.get("feature_registry"), "feature_registry"
+    )
     registry = load_json_file(registry_path, "功能登记")
     allowed = registry.get("allowed_engineering_top_level")
-    if not isinstance(allowed, list) or not all(isinstance(item, str) for item in allowed):
+    if not isinstance(allowed, list) or not all(
+        isinstance(item, str) for item in allowed
+    ):
         return ["功能登记缺少 allowed_engineering_top_level 字符串数组"]
     allowed_names = set(allowed)
     for child in engineering_root.iterdir():
-        if child.is_dir() and child.name not in allowed_names and not child.name.startswith("."):
+        if (
+            child.is_dir()
+            and child.name not in allowed_names
+            and not child.name.startswith(".")
+        ):
             errors.append(f"未登记工程顶层目录：{child.name}")
     for field_name in (
         "project_management_root",
@@ -192,16 +235,24 @@ def validate_layout(project_root: Path, config: dict[str, object], engineering_r
     ):
         path = resolve_inside(project_root, config.get(field_name), field_name)
         if not path.exists():
-            errors.append(f"配置目标不存在：{field_name} -> {path.relative_to(project_root).as_posix()}")
+            errors.append(
+                f"配置目标不存在：{field_name} -> {path.relative_to(project_root).as_posix()}"
+            )
     return errors
 
 
 def validate_documents(project_root: Path, config: dict[str, object]) -> list[str]:
     """检查项目级文档命名和文档型 Skill 的模板链路。"""
     errors: list[str] = []
-    management_root = resolve_inside(project_root, config.get("project_management_root"), "project_management_root")
-    templates_root = resolve_inside(management_root, config.get("templates_dir"), "templates_dir")
-    skills_root = resolve_inside(project_root, config.get("project_skills_root"), "project_skills_root")
+    management_root = resolve_inside(
+        project_root, config.get("project_management_root"), "project_management_root"
+    )
+    templates_root = resolve_inside(
+        management_root, config.get("templates_dir"), "templates_dir"
+    )
+    skills_root = resolve_inside(
+        project_root, config.get("project_skills_root"), "project_skills_root"
+    )
     if not templates_root.exists():
         errors.append("项目管理模板目录不存在")
     if skills_root.exists():
@@ -211,19 +262,23 @@ def validate_documents(project_root: Path, config: dict[str, object]) -> list[st
                 continue
             assets = skill_file.parent / "assets"
             if not assets.is_dir() or not any(assets.iterdir()):
-                errors.append(f"文档型项目 Skill 缺少 assets 模板：{skill_file.relative_to(project_root).as_posix()}")
+                errors.append(
+                    f"文档型项目 Skill 缺少 assets 模板：{skill_file.relative_to(project_root).as_posix()}"
+                )
             if "assets/" not in content:
-                errors.append(f"文档型项目 Skill 未引用模板路径：{skill_file.relative_to(project_root).as_posix()}")
+                errors.append(
+                    f"文档型项目 Skill 未引用模板路径：{skill_file.relative_to(project_root).as_posix()}"
+                )
     for path in management_root.rglob("*"):
         if not path.is_file() or path.suffix.lower() not in {".md", ".html"}:
             continue
         if path.name in FIXED_DOCUMENT_NAMES or path.parent == templates_root:
             continue
         if not DATE_DOCUMENT_PATTERN.fullmatch(path.name):
-            errors.append(f"项目管理文档未采用日期化命名：{path.relative_to(project_root).as_posix()}")
+            errors.append(
+                f"项目管理文档未采用日期化命名：{path.relative_to(project_root).as_posix()}"
+            )
     return errors
-
-
 
 
 def record_metadata(text: str) -> dict[str, str]:
@@ -283,7 +338,7 @@ def validate_current_artifacts(project_root: Path, policy: dict[str, Any]) -> li
             errors.append(f"当前成果入口不存在：{kind} -> {reference}")
         elif anchor:
             text = target.read_text(encoding="utf-8-sig")
-            if not re.search(r'id=[\"\']' + re.escape(anchor) + r'[\"\']', text):
+            if not re.search(r"id=[\"\']" + re.escape(anchor) + r"[\"\']", text):
                 errors.append(f"当前成果入口锚点不存在：{reference}")
     return errors
 
@@ -296,10 +351,133 @@ def recorded_day(value: str) -> str:
     return moment.astimezone(timezone(timedelta(hours=8))).date().isoformat()
 
 
+RESEARCH_KINDS = {
+    "literature",
+    "method",
+    "performance",
+    "analysis",
+    "writing",
+    "research_blocker",
+}
+GUIDE_QUESTION_LIMITS = {1: 14, 2: 16, 3: 17, 4: 14, 5: 14, 6: 15, 7: 14}
+ENGINEERING_PROCESS = re.compile(
+    r"pytest|\bruff\b|\bmypy\b|代码正确性|工程检查|单元测试|静态检查|语法检查|"
+    r"需求登记|登记需求|角色交接|流程登记|哈希核对|校验和对账|"
+    r"(?:建立|生成|创建)(?:工作契约|成果卡|管理报告)|(?:测试|检查)通过数",
+    re.IGNORECASE,
+)
+
+
+def meaningful_research_value(value: object) -> bool:
+    """只判断字段真实可读，不能以字段齐全代替科学真实性判断。"""
+    if isinstance(value, str):
+        cleaned = value.strip()
+        return (
+            bool(cleaned)
+            and cleaned
+            not in {"待填写", "待补充", "TODO", "暂无", "无科研变化", "无科研进展"}
+            and not re.fullmatch(r"<[^>]*>", cleaned)
+        )
+    if isinstance(value, list):
+        return bool(value) and all(meaningful_research_value(item) for item in value)
+    if isinstance(value, dict):
+        return bool(value) and all(
+            meaningful_research_value(item) for item in value.values()
+        )
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(value)
+    )
+
+
+def validate_research_reference(
+    project_root: Path, reference: object, label: str
+) -> list[str]:
+    """科研日志来源限定为项目内真实文件，锚点有值时也须可定位。"""
+    if not isinstance(reference, str) or not reference.strip():
+        return [f"科研日志{label}须提供真实来源"]
+    try:
+        return validate_current_artifacts(
+            project_root, {"current_artifacts": {label: reference}}
+        )
+    except (GovernanceValidationError, UnicodeError, OSError) as exc:
+        return [f"科研日志{label}来源无效：{exc}"]
+
+
+def validate_research_log_entry(
+    project_root: Path, entry: dict[str, Any], policy: dict[str, Any]
+) -> list[str]:
+    """科研派生日志按组会问题合同检查；普通软件日志不受本合同约束。"""
+    identity = str(entry.get("entry_id", ""))
+    errors: list[str] = []
+    contract = policy.get("log_contract", "group-meeting/1.0")
+    if contract != "group-meeting/1.0" or entry.get("report_contract") != contract:
+        errors.append(f"科研日志缺少group-meeting/1.0合同：{identity}")
+    if entry.get("work_kind") not in RESEARCH_KINDS:
+        errors.append(f"科研日志work_kind不是研究工作类型：{identity}")
+    required = (
+        "research_point",
+        "research_source",
+        "research_question",
+        "actions",
+        "result",
+        "interpretation",
+        "limitations",
+        "next_step",
+        "evidence",
+    )
+    for field in required:
+        value = entry.get(field)
+        readable = meaningful_research_value(value)
+        if field != "evidence":
+            readable = isinstance(value, str) and readable
+        if not readable:
+            errors.append(f"科研日志缺少真实{field}：{identity}")
+    errors.extend(
+        validate_research_reference(
+            project_root, entry.get("research_source"), "research_source"
+        )
+    )
+    questions = entry.get("guide_questions")
+    if not isinstance(questions, list) or not questions:
+        errors.append(f"科研日志缺少guide_questions两层映射：{identity}")
+    else:
+        for question in questions:
+            match = (
+                re.fullmatch(r"4\.([1-7])\.Q([1-9]\d*)", question)
+                if isinstance(question, str)
+                else None
+            )
+            if (
+                match is None
+                or int(match.group(2)) > GUIDE_QUESTION_LIMITS[int(match.group(1))]
+            ):
+                errors.append(f"科研日志guide_questions题号无效：{identity}")
+    evidence = entry.get("evidence")
+    if not isinstance(evidence, list) or not evidence:
+        errors.append(f"科研日志evidence须为非空来源数组：{identity}")
+    else:
+        for reference in evidence:
+            errors.extend(
+                validate_research_reference(project_root, reference, "evidence")
+            )
+    if entry.get("work_kind") in {"performance", "analysis"}:
+        for field in ("comparison_conditions", "metrics"):
+            value = entry.get(field)
+            if not isinstance(value, str) or not meaningful_research_value(value):
+                errors.append(f"性能/分析日志缺少非空字符串{field}：{identity}")
+    return errors
+
+
 def validate_daily_records(project_root: Path, config: dict[str, object]) -> list[str]:
     """F001: 校验当前日记录的唯一落点、条目身份与真实记录日。"""
     registry = load_json_file(
-        resolve_inside(project_root, config.get("record_policy_registry", config.get("feature_registry")), "record_policy_registry"),
+        resolve_inside(
+            project_root,
+            config.get("record_policy_registry", config.get("feature_registry")),
+            "record_policy_registry",
+        ),
         "日记录配置",
     )
     policy = registry.get("record_policy")
@@ -325,9 +503,35 @@ def validate_daily_records(project_root: Path, config: dict[str, object]) -> lis
     for item in legacy_values:
         old = resolve_inside(project_root, item, "legacy_paths")
         if not old.is_file():
-            errors.append(f"legacy_paths仅允许存在的精确文件，不能豁免目录或未来新稿：{item}")
+            errors.append(
+                f"legacy_paths仅允许存在的精确文件，不能豁免目录或未来新稿：{item}"
+            )
         else:
             legacy_paths.append(old)
+    minimal = policy.get("process_record_profile") == "minimal"
+    enabled = policy.get("enabled_daily_types", ["requirement", "log"])
+    if minimal and (
+        not isinstance(enabled, list) or set(enabled) != {"requirement", "log"}
+    ):
+        return errors + ["minimal模式仅允许requirement和log两类日记录"]
+    try:
+        minimal_date = date.fromisoformat(
+            str(policy.get("minimal_records_effective_date", "2026-10-30"))
+        )
+    except ValueError:
+        return errors + ["minimal_records_effective_date必须为真实日期"]
+    # 仅专用过程目录按位置判断；契约/交接可能共用正式03/04目录，不能封锁整个成果目录。
+    disabled_directories = {
+        resolve_inside(project_root, item.get("directory"), "record_type.directory")
+        for kind, item in types.items()
+        if minimal
+        and kind in {"supervision", "reflection", "change", "cost", "quality"}
+        and kind not in enabled
+    }
+    process_report_names = re.compile(
+        r"监督(?:记录|报告|简报)|工作契约|交接(?:书|记录|报告)|"
+        r"(?:质量|成本|变更|反思)(?:检查|统计)?(?:记录|报告)|管理报告"
+    )
     targets: dict[tuple[str, str, str], Path] = {}
     entry_ids: set[str] = set()
     events: set[tuple[str, str, str]] = set()
@@ -335,7 +539,10 @@ def validate_daily_records(project_root: Path, config: dict[str, object]) -> lis
         if not path.is_file():
             continue
         relative = path.relative_to(project_root)
-        if any(part in (IGNORED_PARTS - {"output"}) | {"release"} for part in relative.parts):
+        if any(
+            part in (IGNORED_PARTS - {"output"}) | {"release"}
+            for part in relative.parts
+        ):
             continue
         try:
             text = path.read_text(encoding="utf-8-sig")
@@ -350,13 +557,50 @@ def validate_daily_records(project_root: Path, config: dict[str, object]) -> lis
             continue
         registered_legacy = path.resolve() in legacy_paths
         date_match = re.match(r"^(\d{8})-", path.name)
-        inferred = next((canonical for alias, canonical in sorted(aliases.items(), key=lambda pair: -len(pair[0])) if path.stem.casefold() == alias or path.stem.casefold().endswith("-" + alias)), None)
+        inferred = next(
+            (
+                canonical
+                for alias, canonical in sorted(
+                    aliases.items(), key=lambda pair: -len(pair[0])
+                )
+                if path.stem.casefold() == alias
+                or path.stem.casefold().endswith("-" + alias)
+            ),
+            None,
+        )
+        if minimal and not registered_legacy and not declared:
+            try:
+                candidate_day = (
+                    datetime.strptime(date_match.group(1), "%Y%m%d").date()
+                    if date_match
+                    else None
+                )
+            except ValueError:
+                candidate_day = None
+            heading = next(
+                (line for line in text.splitlines() if line.startswith("# ")), ""
+            )
+            disabled_home = any(
+                path.resolve().is_relative_to(home) for home in disabled_directories
+            )
+            renamed_process = process_report_names.search(path.stem + " " + heading)
+            new_or_undated = candidate_day is None or candidate_day >= minimal_date
+            if new_or_undated and (
+                (inferred is not None and inferred not in enabled)
+                or disabled_home
+                or renamed_process
+            ):
+                errors.append(
+                    f"精简模式停用独立过程成稿，不能改名报告逃逸：{relative.as_posix()}"
+                )
         if not declared:
             if not inferred:
                 continue
             if not date_match:
                 if not registered_legacy:
-                    errors.append(f"已识别记录类型缺少规范日期且未登记历史来源：{relative.as_posix()}")
+                    errors.append(
+                        f"已识别记录类型缺少规范日期且未登记历史来源：{relative.as_posix()}"
+                    )
                 continue
             try:
                 dated = datetime.strptime(date_match.group(1), "%Y%m%d").date()
@@ -365,12 +609,18 @@ def validate_daily_records(project_root: Path, config: dict[str, object]) -> lis
                 continue
             if dated < effective or registered_legacy:
                 continue
-            errors.append(f"启用后的记录缺少daily-record/1.0元数据：{relative.as_posix()}")
+            errors.append(
+                f"启用后的记录缺少daily-record/1.0元数据：{relative.as_posix()}"
+            )
             continue
         if schema != "daily-record/1.0":
             errors.append(f"不支持的日记录schema：{relative.as_posix()}")
             continue
-        canonical = aliases.get(metadata.get("record_type", metadata.get("canonical_record_type", "")).casefold())
+        canonical = aliases.get(
+            metadata.get(
+                "record_type", metadata.get("canonical_record_type", "")
+            ).casefold()
+        )
         if canonical is None:
             errors.append(f"未知日记录类型：{relative.as_posix()}")
             continue
@@ -379,37 +629,81 @@ def validate_daily_records(project_root: Path, config: dict[str, object]) -> lis
         except ValueError:
             errors.append(f"日记录日期无效：{relative.as_posix()}")
             continue
-        if (metadata.get("timezone") != "Asia/Shanghai"
-                or metadata.get("project_id") != policy.get("project_id")
-                or metadata.get("record_profile") != policy.get("profile")):
+        if (
+            metadata.get("timezone") != "Asia/Shanghai"
+            or metadata.get("project_id") != policy.get("project_id")
+            or metadata.get("record_profile") != policy.get("profile")
+        ):
             errors.append(f"日记录项目/时区/profile与配置不一致：{relative.as_posix()}")
         archived = metadata.get("record_state") == "archived"
         if archived and not registered_legacy:
-            errors.append(f"归档日记录未登记精确历史原件，不能自标归档豁免：{relative.as_posix()}")
-        readonly = (archived and registered_legacy) or bool(metadata.get("derived_from"))
+            errors.append(
+                f"归档日记录未登记精确历史原件，不能自标归档豁免：{relative.as_posix()}"
+            )
+        readonly = (archived and registered_legacy) or bool(
+            metadata.get("derived_from")
+        )
         if metadata.get("derived_from"):
             source, _ = artifact_target(project_root, metadata["derived_from"])
             if not source.is_file() or source.resolve() == path.resolve():
                 errors.append(f"日记录导出来源无效：{relative.as_posix()}")
             else:
-                source_metadata = record_metadata(source.read_text(encoding="utf-8-sig"))
-                source_type = aliases.get(source_metadata.get("record_type", "").casefold())
-                if (source_metadata.get("schema_version") != "daily-record/1.0"
-                        or source_metadata.get("derived_from") or source_type != canonical
-                        or source_metadata.get("record_date") != day
-                        or source_metadata.get("project_id") != metadata.get("project_id")
-                        or source_metadata.get("record_profile") != metadata.get("record_profile")):
+                source_metadata = record_metadata(
+                    source.read_text(encoding="utf-8-sig")
+                )
+                source_type = aliases.get(
+                    source_metadata.get("record_type", "").casefold()
+                )
+                if (
+                    source_metadata.get("schema_version") != "daily-record/1.0"
+                    or source_metadata.get("derived_from")
+                    or source_type != canonical
+                    or source_metadata.get("record_date") != day
+                    or source_metadata.get("project_id") != metadata.get("project_id")
+                    or source_metadata.get("record_profile")
+                    != metadata.get("record_profile")
+                ):
                     errors.append(f"日记录导出来源身份不匹配：{relative.as_posix()}")
+        research_contract = False
+        if canonical == "log" and policy.get("profile") == "research":
+            try:
+                contract_start = date.fromisoformat(
+                    str(policy.get("log_contract_effective_date", "2026-10-30"))
+                )
+                research_contract = date.fromisoformat(day) >= contract_start
+            except ValueError:
+                errors.append("科研日志合同启用日无效")
+            if (
+                research_contract
+                and not (archived and registered_legacy)
+                and ENGINEERING_PROCESS.search(text)
+            ):
+                errors.append(
+                    f"科研日志正文或附录含工程检查/登记交接过程：{relative.as_posix()}"
+                )
+        if (
+            minimal
+            and date.fromisoformat(day) >= minimal_date
+            and canonical not in enabled
+            and not (archived and registered_legacy)
+        ):
+            errors.append(
+                f"精简模式停用日记录类型：{canonical} / {relative.as_posix()}"
+            )
         if readonly:
             continue
         definition = types[canonical]
-        directory = resolve_inside(project_root, definition.get("directory"), "record_type.directory")
+        directory = resolve_inside(
+            project_root, definition.get("directory"), "record_type.directory"
+        )
         filename = f"{day.replace('-', '')}-{definition.get('filename_body')}-{definition.get('label')}.md"
         if path.resolve() != (directory / filename).resolve():
             errors.append(f"日记录不在唯一规范落点：{relative.as_posix()}")
         key = (str(policy["project_id"]), day, canonical)
         if key in targets:
-            errors.append(f"同日同类型存在多个可写文件：{relative.as_posix()} / {targets[key].relative_to(project_root).as_posix()}")
+            errors.append(
+                f"同日同类型存在多个可写文件：{relative.as_posix()} / {targets[key].relative_to(project_root).as_posix()}"
+            )
         targets[key] = path
         matches = re.findall(r"<!--\s*daily-entry\s+(\{.*?\})\s*-->", text, re.DOTALL)
         if not matches:
@@ -423,15 +717,28 @@ def validate_daily_records(project_root: Path, config: dict[str, object]) -> lis
             if not isinstance(entry, dict):
                 errors.append(f"日记录条目不是对象：{relative.as_posix()}")
                 continue
+            if canonical == "log":
+                if policy.get("profile") == "research" and research_contract:
+                    errors.extend(
+                        validate_research_log_entry(project_root, entry, policy)
+                    )
+                elif policy.get(
+                    "profile"
+                ) == "software" and not meaningful_research_value(
+                    entry.get("requirement_id")
+                ):
+                    errors.append("软件日志条目须绑定需求/用户功能requirement_id")
             entry_id = entry.get("entry_id")
-            if not isinstance(entry_id, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.:-]*", entry_id):
+            if not isinstance(entry_id, str) or not re.fullmatch(
+                r"[A-Za-z0-9][A-Za-z0-9_.:-]*", entry_id
+            ):
                 errors.append(f"日记录条目ID无效：{relative.as_posix()}")
                 continue
             if entry_id in entry_ids:
                 errors.append(f"重复日记录条目ID：{entry_id}")
             entry_ids.add(entry_id)
             anchor = "entry-" + entry_id
-            if len(re.findall(r'id=[\"\']' + re.escape(anchor) + r'[\"\']', text)) != 1:
+            if len(re.findall(r"id=[\"\']" + re.escape(anchor) + r"[\"\']", text)) != 1:
                 errors.append(f"日记录条目锚点缺失或重复：{entry_id}")
             event = entry.get("event_key")
             if not isinstance(event, str) or not event:
@@ -451,13 +758,96 @@ def validate_daily_records(project_root: Path, config: dict[str, object]) -> lis
     return errors
 
 
+def validate_technical_documents(engineering_root: Path) -> list[str]:
+    """检查当前技术对象归属及精确来源绑定，不评价科学结论。"""
+    import hashlib
+
+    registry = next(
+        (
+            engineering_root / name
+            for name in ("configs/features.yaml", "config/feature-registry.yaml")
+            if (engineering_root / name).is_file()
+        ),
+        None,
+    )
+    if registry is None:
+        return []
+    policy = json.loads(registry.read_text(encoding="utf-8-sig")).get(
+        "technical_documents", {}
+    )
+    if not policy.get("enabled"):
+        return []
+    root = engineering_root.resolve()
+    home = (root / policy.get("root", "docs")).resolve()
+    if not home.is_relative_to(root):
+        return ["技术文档目录越界"]
+    errors = []
+    pins = policy.get("pinned_paths", {})
+    baseline = set(policy.get("baseline_paths", []))
+    identities = set()
+    for relative, expected in pins.items():
+        source = (root / relative).resolve()
+        if (
+            not source.is_relative_to(home)
+            or not source.is_file()
+            or hashlib.sha256(source.read_bytes()).hexdigest() != expected
+        ):
+            errors.append("技术原件来源绑定改变或缺失：" + relative)
+    for path in home.rglob("*"):
+        if not path.is_file():
+            continue
+        relative = path.relative_to(root).as_posix()
+        if path.is_symlink() or not path.resolve().is_relative_to(home):
+            errors.append("技术文档链接越界：" + relative)
+            continue
+        if relative in pins or relative in baseline or path.name == ".gitkeep":
+            continue
+        local = path.relative_to(home)
+        if (
+            path.parent == home and path.name not in policy.get("root_entries", [])
+        ) or (
+            len(local.parts) > 1
+            and local.parts[0] not in policy.get("stable_directories", [])
+        ):
+            errors.append("技术文档缺少明确对象归属：" + relative)
+        if path.suffix in {".diff", ".txt"} or any(
+            path.name.endswith("-" + kind + ".md")
+            for kind in (
+                "工作契约",
+                "工程交付记录",
+                "检查记录",
+                "修订记录",
+                "技术诊断",
+                "工程复验记录",
+                "源码记录",
+            )
+        ):
+            errors.append("过程材料、补丁或源码快照不得进入当前docs：" + relative)
+        if path.suffix == ".md":
+            text = path.read_text(encoding="utf-8-sig")
+            if "daily-record/1.0" in text[:512]:
+                errors.append("日记录不得进入docs：" + relative)
+            for line in text[:1500].splitlines():
+                if line.startswith("object_id:"):
+                    identity = line.partition(":")[2].strip()
+                    if identity in identities:
+                        errors.append("技术对象存在多个当前正文：" + identity)
+                    identities.add(identity)
+    return errors
+
+
 def run(project_root: Path) -> int:
     """执行只读治理检查并返回稳定退出码。"""
     try:
         config = load_project_config(project_root)
         feature_errors, engineering_root = validate_features(project_root, config)
-        errors = (feature_errors + validate_layout(project_root, config, engineering_root)
-                  + validate_documents(project_root, config) + validate_daily_records(project_root, config))
+        errors = (
+            feature_errors
+            + validate_layout(project_root, config, engineering_root)
+            + validate_documents(project_root, config)
+            + validate_daily_records(project_root, config)
+            + validate_technical_documents(engineering_root)
+        )
     except (GovernanceValidationError, OSError, UnicodeError, TypeError) as exc:
         errors = [str(exc)]
     for message in errors:
